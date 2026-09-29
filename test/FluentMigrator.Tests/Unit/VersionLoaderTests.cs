@@ -383,10 +383,13 @@ namespace FluentMigrator.Tests.Unit
         [TestCase(typeof(VersionLoader), false, false, false, true, false)]
         [TestCase(typeof(VersionLoader), false, false, true, false, false)]
         [TestCase(typeof(VersionLoader), true, false, false, true, false)]
+        [TestCase(typeof(VersionLoader), true, false, true, false, false)]
         [TestCase(typeof(VersionLoader), true, true, false, false, false)]
         [TestCase(typeof(VersionLoader), true, true, true, false, false)]
         [TestCase(typeof(ConnectionlessVersionLoader), false, false, false, true, true)]
         [TestCase(typeof(ConnectionlessVersionLoader), false, false, true, true, true)]
+        [TestCase(typeof(ConnectionlessVersionLoader), true, false, false, true, true)]
+        [TestCase(typeof(ConnectionlessVersionLoader), true, false, true, true, true)]
         [TestCase(typeof(ConnectionlessVersionLoader), true, true, false, false, false)]
         [TestCase(typeof(ConnectionlessVersionLoader), true, true, true, false, false)]
         public void LoadVersionInfoIfRequiredReportsWhetherTheVersionTableWasCreated(
