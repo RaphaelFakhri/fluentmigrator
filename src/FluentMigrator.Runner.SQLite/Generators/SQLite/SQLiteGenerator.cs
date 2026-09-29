@@ -17,6 +17,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -142,7 +143,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public override string Generate(CreateColumnExpression expression)
         {
             var foreignKey = expression.Column.ForeignKey;
-            if (!expression.Column.IsForeignKey || foreignKey == null)
+            if (!expression.Column.IsForeignKey || !IsSingleColumnKeyOn(foreignKey, expression.Column.Name))
             {
                 return base.Generate(expression);
             }
@@ -166,6 +167,30 @@ namespace FluentMigrator.Runner.Generators.SQLite
             }
 
             return trimmed + " " + referencesClause;
+        }
+
+        /// <summary>
+        /// Determines whether a foreign key is a single-column key declared on the given column, the only
+        /// shape that can be written as a column-level <c>REFERENCES</c> clause.
+        /// </summary>
+        /// <param name="foreignKey">The foreign key to inspect</param>
+        /// <param name="columnName">The name of the column being added</param>
+        /// <returns><c>true</c> when the key has one foreign and one primary column and the foreign column is <paramref name="columnName"/></returns>
+        private static bool IsSingleColumnKeyOn(ForeignKeyDefinition foreignKey, string columnName)
+        {
+            if (foreignKey == null)
+            {
+                return false;
+            }
+
+            var foreignColumns = foreignKey.ForeignColumns;
+            var primaryColumns = foreignKey.PrimaryColumns;
+
+            return foreignColumns != null
+                && primaryColumns != null
+                && foreignColumns.Count == 1
+                && primaryColumns.Count == 1
+                && string.Equals(foreignColumns.First(), columnName, StringComparison.Ordinal);
         }
 
         /// <inheritdoc />
@@ -242,7 +267,8 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
             return
                 $"Foreign key {name}cannot be created with Create.ForeignKey on SQLite. SQLite accepts foreign keys " +
-                "only inside a CREATE TABLE statement; it has no ALTER TABLE ... ADD CONSTRAINT. " +
+                "only inside a CREATE TABLE statement or as a REFERENCES clause on a column being added; " +
+                "it has no ALTER TABLE ... ADD CONSTRAINT. " +
                 $"Declare the key on the column when the table is created - {example} - which FluentMigrator " +
                 "generates inline and SQLite accepts. A new column can also be added with its key declared, " +
                 "using Alter.Table(...).AddColumn(...).ForeignKey(...). To add a key to a column that already " +
