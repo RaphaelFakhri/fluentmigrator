@@ -351,5 +351,30 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var result = Generator.Generate(createForeignKey);
             result.ShouldBe(string.Empty);
         }
+
+        [Test]
+        public void CreatingColumnWithForeignKeyOnAnotherColumnDoesNotEmitReferencesClause()
+        {
+            var (addColumn, createForeignKey) = GetCreateColumnWithForeignKeyExpressions("FK_TestTable1_TestColumn1");
+            addColumn.Column.ForeignKey.ForeignColumns = new[] { "SomeOtherColumn" };
+
+            var result = Generator.Generate(addColumn);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" INTEGER;");
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(createForeignKey));
+        }
+
+        [Test]
+        public void CreatingColumnWithCompositeForeignKeyDoesNotEmitReferencesClause()
+        {
+            var (addColumn, createForeignKey) = GetCreateColumnWithForeignKeyExpressions("FK_TestTable1_TestColumn1");
+            addColumn.Column.ForeignKey.ForeignColumns = new[] { GeneratorTestHelper.TestColumnName1, "SomeOtherColumn" };
+            addColumn.Column.ForeignKey.PrimaryColumns = new[] { GeneratorTestHelper.TestColumnName2, "SomeOtherPrimaryColumn" };
+
+            var result = Generator.Generate(addColumn);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" INTEGER;");
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(createForeignKey));
+        }
     }
 }
