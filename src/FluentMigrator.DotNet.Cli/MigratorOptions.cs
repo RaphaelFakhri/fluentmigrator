@@ -41,6 +41,7 @@ namespace FluentMigrator.DotNet.Cli
         // MigratorOptionsMapper can assign them. They remain invisible outside this assembly.
         public string ConnectionString { get; internal set; }
         public string ProcessorType { get; internal set; }
+        public string GeneratorType { get; internal set; }
         public string ProcessorSwitches { get; internal set; }
         public IReadOnlyCollection<string> TargetAssemblies { get; internal set; }
         public long? TargetVersion { get; internal set; }
@@ -126,6 +127,7 @@ namespace FluentMigrator.DotNet.Cli
             ConnectionString = cmd.ConnectionString;
             NoConnection = cmd.NoConnection;
             ProcessorType = cmd.ProcessorType;
+            GeneratorType = cmd.GeneratorType;
             ProcessorSwitches = cmd.ProcessorSwitches;
             Preview = cmd.Preview;
             Verbose = cmd.Verbose;
