@@ -673,9 +673,14 @@ namespace FluentMigrator.Tests.Integration
         /// - Process all masking rules in the database
         /// - Throw errors for invalid rules (e.g., masking NOT NULL columns with NULL)
         /// - With client_min_messages=DEBUG, show detailed information about each rule being processed
+        ///
+        /// Recent PostgreSQL Anonymizer releases default anon.nosuperuser to on, which rejects static
+        /// masking for superusers. The test connection is a superuser, so the setting is turned off
+        /// for this session first.
         /// </remarks>
         private static void ValidateAnonymizationWorks(ProcessorBase processor)
         {
+            processor.Execute("SET anon.nosuperuser = off;");
             processor.Execute("SELECT anon.anonymize_database();");
         }
 
