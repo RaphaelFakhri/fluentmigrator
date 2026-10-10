@@ -38,6 +38,9 @@ namespace FluentMigrator.DotNet.Cli.Commands
         [Required]
         public string ProcessorType { get; set; }
 
+        [Option("--generator <GENERATOR_NAME>", Description = "The SQL dialect (database engine version) the migrations are generated for. Defaults to the one that matches the processor. Only needed to pick a different one, for example \"Oracle12c\" with a processor for another Oracle driver.")]
+        public string GeneratorType { get; set; }
+
         [Option("-s|--processor-switches <PROCESSOR_SWITCHES>", Description = "Provider specific switches.")]
         public string ProcessorSwitches { get; set; }
 

@@ -19,6 +19,7 @@ using System.Linq;
 
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
@@ -110,6 +111,7 @@ namespace FluentMigrator.DotNet.Cli
             services
                 .AddSingleton<IConventionSet>(conventionSet)
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = options.ProcessorType)
+                .Configure<SelectingGeneratorAccessorOptions>(opt => opt.GeneratorId = GeneratorSelection.Resolve(options.GeneratorType, options.ProcessorType))
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = options.TargetAssemblies.ToArray())
                 .Configure<TypeFilterOptions>(
                     opt =>

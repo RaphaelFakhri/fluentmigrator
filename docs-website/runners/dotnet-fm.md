@@ -68,6 +68,7 @@ dotnet fm migrate [options]
 | Option | Short | Description | Required |
 |--------|-------|-------------|----------|
 | `--provider` | `-p` | Database provider | Yes |
+| `--generator` | | SQL generator to use instead of the one that matches the provider | No |
 | `--connectionString` | `-c` | Connection string | Yes |
 | `--assembly` | `-a` | Migration assembly path | Yes |
 | `--version` | `-v` | Target version | No |
@@ -84,6 +85,32 @@ dotnet fm migrate [options]
 | `--startVersion` | | Start from version | No |
 | `--noConnection` | | Validate without connecting | No |
 | `--help` | `-h` | Show help | No |
+
+### Processor and generator selection
+
+A migration runner uses two parts to talk to a database:
+
+- The **processor** wires in the database driver and runs the SQL. `-p` selects it.
+- The **generator** produces the SQL for one database engine version, such as `SqlServer2016` or `Oracle12c`. It does not depend on the driver.
+
+By default `-p` is a shorthand that selects both. The generator is the one whose id or alias matches the processor id. For most processors the ids are the same, so you only pass `-p`.
+
+When a processor id names a driver, the CLI selects the generator for the engine instead:
+
+| `-p` | Generator selected |
+|------|--------------------|
+| `Oracle` | `Oracle` |
+| `OracleManaged` | `OracleManaged` |
+| `Oracle12c` | `Oracle12c` |
+| `Oracle12cManaged` | `Oracle12c` |
+
+To choose the two parts independently, pass `--generator`. It overrides the default choice, and `-p` still selects the processor:
+
+```bash
+dotnet fm migrate -p Oracle12cManaged --generator Oracle12c -c "..." -a "MyApp.dll"
+```
+
+Run `dotnet fm list processors` to see the processor ids.
 
 ### list Command
 Lists migrations and their status.
