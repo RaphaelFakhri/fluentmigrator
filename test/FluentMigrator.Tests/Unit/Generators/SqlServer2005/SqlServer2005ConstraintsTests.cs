@@ -23,6 +23,7 @@ using System.Linq;
 
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Delete.Constraint;
+using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -922,6 +923,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
             Assert.That(ex, Is.Not.Null);
             Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
+        }
+
+        [Test]
+        public virtual void CanDropAutoReversedClusteredUniqueConstraintKeepingOnlineOption()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            new CreateConstraintExpressionBuilder(expression).Clustered().Online();
+
+            var reversed = expression.Reverse();
+
+            var result = Generator.Generate((DeleteConstraintExpression)reversed);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [UC_TestTable1_TestColumn1] WITH (ONLINE=ON);");
         }
 
         [Test]
