@@ -417,6 +417,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
                 exception.Message.ShouldContain("only inside a CREATE TABLE statement");
                 exception.Message.ShouldContain("ALTER TABLE");
 
+                // Mentions the column-level form that is accepted when a column is added.
+                exception.Message.ShouldContain("REFERENCES clause on a column being added");
+
                 // Gives the form that does work, built from this key's own tables and columns.
                 exception.Message.ShouldContain(".ForeignKey(\"TestTable2\", \"TestColumn2\")");
 
