@@ -82,6 +82,8 @@ public class UniqueIndexes : Migration
 }
 ```
 
+Engines disagree on whether two NULLs conflict in a unique index. To state the intended behavior in a provider-agnostic way, use `UniqueTreatNullsAsDistinct()` or `UniqueTreatNullsAsEqual()`. For details, see [NULL handling in unique indexes](./unique-index-nulls.md).
+
 ### Filtered Indexes
 
 ```csharp
@@ -142,3 +144,4 @@ Different database providers offer specialized indexing capabilities and advance
 - [Execute SQL](../operations/execute-sql.md) - When you need to create indexes with provider-specific SQL
 - [Columns](./columns.md) - Column indexing strategies and patterns
 - [Constraints](./constraints.md) - Index-backed constraint types
+- [NULL handling in unique indexes](./unique-index-nulls.md) - Provider-agnostic NULL semantics for unique indexes

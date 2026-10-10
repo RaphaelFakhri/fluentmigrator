@@ -26,9 +26,10 @@ namespace FluentMigrator
     /// </summary>
     /// <remarks>
     /// Database engines disagree on whether two NULLs conflict in a unique index. SQL Server
-    /// and Db2 treat them as equal, so only one NULL row is permitted; PostgreSQL, SQLite and
-    /// MySQL treat them as distinct, so any number of NULL rows is permitted. A migration that
-    /// relies on the default therefore means different things on different engines.
+    /// and Db2 treat them as equal, so only one NULL row is permitted; PostgreSQL, SQLite,
+    /// MySQL and Firebird treat them as distinct, so any number of NULL rows is permitted. A
+    /// migration that relies on the default therefore means different things on different
+    /// engines.
     ///
     /// These methods state the intent instead, and each provider maps it to whatever native
     /// syntax expresses it. Where an engine cannot express the requested semantics the request
@@ -37,6 +38,10 @@ namespace FluentMigrator
     ///
     /// The provider-specific extensions in <c>FluentMigrator.Postgres</c> and
     /// <c>FluentMigrator.SqlServer</c> are unaffected and take precedence when both are set.
+    ///
+    /// For the SQL that each provider emits, and what happens when a provider cannot express
+    /// the request, see
+    /// <see href="https://fluentmigrator.github.io/basics/unique-index-nulls.html">NULL handling in unique indexes</see>.
     /// </remarks>
     public static class CreateIndexNullSemanticsExtensions
     {
@@ -51,8 +56,10 @@ namespace FluentMigrator
         /// conflict with one another, so any number of them may exist.
         /// </summary>
         /// <remarks>
-        /// Native on PostgreSQL, SQLite and MySQL. On SQL Server 2008 and later this is
-        /// emitted as a filtered index excluding NULL rows.
+        /// Native on PostgreSQL, SQLite, MySQL and Firebird. On SQL Server 2008 and later this
+        /// is emitted as a filtered index excluding NULL rows. Other providers route the request
+        /// through the compatibility mode. See
+        /// <see href="https://fluentmigrator.github.io/basics/unique-index-nulls.html#semantics-per-provider">semantics per provider</see>.
         /// </remarks>
         /// <param name="expression">The expression to set this option for</param>
         /// <returns>The <paramref name="expression"/></returns>
@@ -64,8 +71,10 @@ namespace FluentMigrator
         /// row may hold NULL in the indexed columns.
         /// </summary>
         /// <remarks>
-        /// Native on SQL Server. On PostgreSQL 15 and later this is emitted as
-        /// <c>NULLS NOT DISTINCT</c>.
+        /// Native on SQL Server 2005 and later and on Db2. On PostgreSQL 15 and later this is
+        /// emitted as <c>NULLS NOT DISTINCT</c>. Other providers route the request through the
+        /// compatibility mode. See
+        /// <see href="https://fluentmigrator.github.io/basics/unique-index-nulls.html#semantics-per-provider">semantics per provider</see>.
         /// </remarks>
         /// <param name="expression">The expression to set this option for</param>
         /// <returns>The <paramref name="expression"/></returns>

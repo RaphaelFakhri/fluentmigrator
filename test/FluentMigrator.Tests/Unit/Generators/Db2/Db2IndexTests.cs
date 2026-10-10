@@ -1,3 +1,7 @@
+using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Exceptions;
+using FluentMigrator.Expressions;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 
@@ -111,6 +115,36 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX TestIndex;");
+        }
+
+        [Test]
+        public void CanCreateUniqueIndexTreatingNullsAsEqualInStrictMode()
+        {
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
+
+            var expression = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
+            new CreateIndexExpressionBuilder(expression)
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .OnColumn(GeneratorTestHelper.TestColumnName2).Ascending()
+                .WithOptions().UniqueTreatNullsAsEqual();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2);");
+        }
+
+        [Test]
+        public void CreatingUniqueIndexTreatingNullsAsDistinctThrowsInStrictMode()
+        {
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
+
+            var expression = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
+            new CreateIndexExpressionBuilder(expression)
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .WithOptions().UniqueTreatNullsAsDistinct();
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
     }
 }
